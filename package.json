@@ -1,0 +1,20 @@
+{
+  "name": "ufc-load-testing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "k6 load-testing project for the UFC Pantheon multidev website.",
+  "scripts": {
+    "test:smoke": "k6 run -e LOAD_PROFILE=smoke tests/ufc-load-test.js",
+    "test:low": "k6 run -e LOAD_PROFILE=low tests/ufc-load-test.js",
+    "test:medium": "k6 run -e LOAD_PROFILE=medium tests/ufc-load-test.js",
+    "test:high": "k6 run -e LOAD_PROFILE=high tests/ufc-load-test.js",
+    "test:target": "k6 run -e LOAD_PROFILE=target tests/ufc-load-test.js"
+  },
+  "keywords": [
+    "k6",
+    "load-testing",
+    "performance",
+    "ufc"
+  ],
+  "license": "UNLICENSED"
+}
