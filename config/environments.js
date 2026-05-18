@@ -37,4 +37,8 @@ export const loadProfiles = {
 export const defaultThresholds = {
   http_req_failed: ['rate<0.01'],
   http_req_duration: ['p(95)<1500'],
+  homepage_duration: ['p(95)<2500'],
+  events_duration: ['p(95)<2500'],
+  athletes_duration: ['p(95)<1500'],
+  news_duration: ['p(95)<1500'],
 };

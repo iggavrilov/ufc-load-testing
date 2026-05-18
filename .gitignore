@@ -1,5 +1,9 @@
 results/*
 !results/.gitkeep
+!results/comparison-report.md
+!results/diagnostics-report.md
+!results/developer-performance-issue.md
+!results/cache-variant-report.md
 .env
 .env.*
 !.env.example
