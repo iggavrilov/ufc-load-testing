@@ -1,5 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import encoding from 'k6/encoding';
 import {
   defaultThresholds,
   environments,
@@ -11,6 +12,8 @@ const LOAD_PROFILE = __ENV.LOAD_PROFILE || 'smoke';
 const OUTPUT_BASENAME = __ENV.OUTPUT_BASENAME || `ufc-${LOAD_PROFILE}-summary`;
 const BASE_URL = (__ENV.BASE_URL || environments[ENVIRONMENT]?.baseUrl || '').replace(/\/$/, '');
 const PROFILE = loadProfiles[LOAD_PROFILE];
+const BASIC_AUTH_USER = __ENV.BASIC_AUTH_USER;
+const BASIC_AUTH_PASSWORD = __ENV.BASIC_AUTH_PASSWORD;
 
 if (!BASE_URL) {
   throw new Error(`Unknown environment "${ENVIRONMENT}". Set ENVIRONMENT or BASE_URL.`);
@@ -33,6 +36,24 @@ export const options = {
   thresholds: defaultThresholds,
 };
 
+function requestParams(page) {
+  const headers = {};
+
+  if (BASIC_AUTH_USER && BASIC_AUTH_PASSWORD) {
+    const credentials = `${BASIC_AUTH_USER}:${BASIC_AUTH_PASSWORD}`;
+    headers.Authorization = `Basic ${encoding.b64encode(credentials)}`;
+  }
+
+  return {
+    headers,
+    tags: {
+      page_name: page.name,
+      page_path: page.path,
+      auth: BASIC_AUTH_USER && BASIC_AUTH_PASSWORD ? 'basic' : 'none',
+    },
+  };
+}
+
 const journey = [
   { name: 'homepage', path: '/' },
   { name: 'events page', path: '/events' },
@@ -45,12 +66,7 @@ function thinkTime(min = 1, max = 4) {
 }
 
 function getPage(page) {
-  const res = http.get(`${BASE_URL}${page.path}`, {
-    tags: {
-      page_name: page.name,
-      page_path: page.path,
-    },
-  });
+  const res = http.get(`${BASE_URL}${page.path}`, requestParams(page));
 
   check(res, {
     [`${page.name}: status is 200`]: (r) => r.status === 200,
@@ -61,6 +77,10 @@ function getPage(page) {
 }
 
 function findArticlePath(newsResponse) {
+  if (!newsResponse || newsResponse.error || !newsResponse.body) {
+    return '/news';
+  }
+
   const links = newsResponse
     .html()
     .find('a')

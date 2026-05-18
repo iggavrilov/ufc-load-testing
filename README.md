@@ -69,6 +69,25 @@ k6 version
 
 No npm dependencies are required.
 
+## Basic Auth
+
+The multidev site is protected by Basic Auth. Do not commit credentials to the repository.
+
+For local runs, set credentials as environment variables:
+
+```powershell
+$env:BASIC_AUTH_USER = "ufc"
+$env:BASIC_AUTH_PASSWORD = "<password>"
+```
+
+Then run k6 in the same PowerShell session:
+
+```powershell
+k6 run -e LOAD_PROFILE=smoke tests/ufc-load-test.js
+```
+
+Basic Auth is sent as an HTTP `Authorization` header over HTTPS. The header value is Base64-encoded as required by Basic Auth; this is not encryption, so keep credentials in local environment variables or a secret manager.
+
 ## Run Commands
 
 Smoke test:
